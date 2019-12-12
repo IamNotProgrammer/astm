@@ -2,21 +2,16 @@
 #include <ctime>
 #include <math.h>
 
-double JDg(int y, int m, int d, int h, int mi, int s)
+double JD(int y, int m, int d, int h, int mi, int s)
 	{
 
-	double JDN, JD ;
+	double jd ;
 
-	JDN = ( 1461 * ( y + 4800 + (m-14) / 12 ) ) * 0.25 + ( 367 * ( m - 2
-		- 12 * ( (m - 14) / 12 ) ) ) / 12 - ( 3 * ( ( y + 4900
-		+ (m-14) / 12 ) * 0.01 ) ) * 0.25 + d - 32075 ;
+	dd = d_d(2000, 1, 14, 12, 0, 0, y, m, d, h, mi, s) ;
 
-	JD = JDN + (h - 12) / 24 + m / 1440 + s / 86400 ;
+	jd = 2451545.0 + dd ;
 
-	if (h < 12)
-		JD += 1 ;
-
-	return JD ;
+	return jd ;
 
 	}
 
@@ -40,13 +35,17 @@ double d_d(int y0, int m0, int d0, int h0, int mi0, int s0, int y, int m, int d,
 double GMST(int y, int m, int d, int h, int mi, int s)
 	{
 
-	double d, T, gmst ;
+	double D, T, gmst ;
 
-	d = JDg(y, m, d, h, mi, s) - 2451545.0 ;
-	T = d / 36525 ;
+	D = int ( JD(y, m, d, h, mi, s) ) - 2451545.5 ;
+	T = D / 36525 ;
 
 	gmst = 24110.54841 + 8640184.812866 * T + 0.093104 * T * T
-		- 0.0000063 * T * T * T ;
+		- 0.00000632 * T * T * T ;
+
+	gmst *= 0.0002777777777777778 ;
+	gmst += ( h + mi * 0.0166666666666 + s * 0.0002777777777777 ) * 1.002737909
+	gmst = fmod(gmst, 24.0) ;
 
 	return gmst ;
 
