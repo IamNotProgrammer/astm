@@ -1,6 +1,6 @@
 #include "astm.h"
-#include <ctime>
 #include <math.h>
+#include <stdio.h>
 
 //	  year   month  day    hour   minute  second
 double JD(int y, int m, int d, int h, int mi, float s)
@@ -21,17 +21,52 @@ double JD(int y, int m, int d, int h, int mi, float s)
 double d_d(int y0, int m0, int d0, int h0, int mi0, float s0, int y, int m, int d, int h, int mi, float s)
 	{
 
-	struct std::tm a = { s0, mi0, h0, d0, m0 - 1, y0 - 1900 } ;
+	int month[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31} ;
 
-	struct std::tm b = { s, mi, h, d, m - 1, y - 1900 } ;
+	int year ;
+	double diff = 0 ; // day difference
 
-	std::time_t x = std::mktime(&a);
+	if (y0 < y)
+		{
 
-	std::time_t z = std::mktime(&b);
+		year = y0 + 1 ;
 
-	long double difference = std::difftime(z, x) * 0.000011574074074074073 ;
+		if ( ( (y0 % 4) == 0 ) && ( ( (y0 % 100) != 0) || ( (y0 % 400) == 0) ) )
+			month[1] = 29 ;
 
-	return difference ;
+		diff += month[m0 - 1] - d0 + 1 ;
+		diff += - double(h0) / 24 - double(mi0) / 1440 - s0 / 86400 ; // hour in day
+
+		for (int c = m0; c < 12; c++)
+			diff += month[c] ;
+
+		diff += d - 1 ;
+		diff += double(h) / 24 + double(mi) / 1440 + s / 86400 ;
+		
+		for(int i = 0; i < (m - 1); i++)
+			diff += month[i] ;
+
+		}
+
+
+	else
+		year = y + 1 ;
+
+
+	for (int i = 1; i < abs(y0 - y); i++)
+		{
+
+		if ( ( (year % 4) == 0 ) && ( ( (year % 100) != 0) || ( (year % 400) == 0) ) ) // leap?
+			diff += 366 ;
+
+		else
+			diff += 365 ;
+
+		year++ ;
+
+		}
+
+	return diff ;
 
 	}
 
@@ -83,7 +118,7 @@ double UTC2TAI(int y, int m, int d, int h, int mi, double s)
 	if ( ( (y - 1972) < n ) and (m > 6) )	
 		l += leap[y - 1972][0] ;
 
-	TAI = h + double(mi) 0.01666666666666666 + (s + double(l)) * 2.777777777777777777e-4 ;
+	TAI = h + double(mi) * 0.01666666666666666 + (s + double(l)) * 2.777777777777777777e-4 ;
 
 	return TAI ;
 
