@@ -43,6 +43,12 @@ double d_d(int y0, int m0, int d0, int h0, int mi0, float s0, int y, int m, int 
 		diff += d - 1 ;
 		diff += double(h) / 24 + double(mi) / 1440 + s / 86400 ;
 		
+		if ( ( (y % 4) == 0 ) && ( ( (y % 100) != 0) || ( (y % 400) == 0) ) )
+			month[1] = 29 ;
+		
+		else
+			month[1] = 28 ;
+		
 		for(int i = 0; i < (m - 1); i++)
 			diff += month[i] ;
 
