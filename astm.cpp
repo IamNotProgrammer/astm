@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 //	  year   month  day    hour   minute  second
-double JD(int y, int m, int d, int h, int mi, float s)
+double JD(int y, int m, int d, int h, int mi, double s)
 	{
 
 	double jd, dd ;
@@ -18,7 +18,7 @@ double JD(int y, int m, int d, int h, int mi, float s)
 
 
 //	   year 0  month 0 day 0   hour 0  minute 0 sec 0     year   month  day    hour   minute  second
-double d_d(int y0, int m0, int d0, int h0, int mi0, float s0, int y, int m, int d, int h, int mi, float s)
+double d_d(int y0, int m0, int d0, int h0, int mi0, double s0, int y, int m, int d, int h, int mi, double s)
 	{
 
 	int month[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31} ;
@@ -93,6 +93,55 @@ double d_d(int y0, int m0, int d0, int h0, int mi0, float s0, int y, int m, int 
 
 		}
 
+	else // if y0 == y
+		{
+
+		if ( ( (y0 % 4) == 0 ) && ( ( (y0 % 100) != 0) || ( (y0 % 400) == 0) ) )
+			month[1] = 29 ;
+
+		if (m0 < m)
+			{
+
+			diff += month[m0 - 1] - d0 + 1 ;
+			diff += -double(h0) / 24 - double(mi0) / 1440 - s0 / 86400 ;
+
+			diff += d - 1 ;
+			diff += double(h) / 24 + double(mi) / 1440 + s / 86400 ;
+			
+			for (int i = m0; i < m - 1; i++)
+				diff += month[i] ;
+
+			}
+
+		else if (m0 > m)
+			{
+
+			diff += month[m - 1] - d + 1 ;
+			diff += -double(h) / 24 - double(mi) / 1440 - s / 86400 ;
+
+			diff += d0 - 1 ;
+			diff += double(h0) / 24 + double(mi0) / 1440 + s0 / 86400 ;
+			
+			for (int i = m; i < m0 - 1; i++)
+				diff += month[i] ;
+
+			// printf("lol\n") ;
+			diff = -diff ;
+
+			}
+
+		else
+			{
+
+			diff += d - d0 ;
+			diff += double(h) / 24 + double(mi) / 1440 + s / 86400 ;	
+			diff += -double(h0) / 24 - double(mi0) / 1440 - s0 / 86400 ;
+
+			}
+
+		}
+
+
 	for (int i = 1; i < abs(y0 - y); i++)
 		{
 
@@ -106,11 +155,14 @@ double d_d(int y0, int m0, int d0, int h0, int mi0, float s0, int y, int m, int 
 
 		}
 
+	if (y < y0)
+		diff = -diff ;	
+
 	return diff ;
 
 	}
 
-double GMST(int y, int m, int d, int h, int mi, float s)
+double GMST(int y, int m, int d, int h, int mi, double s)
 	{
 
 	double D, T, gmst ;
@@ -122,7 +174,7 @@ double GMST(int y, int m, int d, int h, int mi, float s)
 		- 0.00000632 * T * T * T ;
 
 	gmst *= 0.0002777777777777778 ;
-	gmst += ( h + mi * 0.0166666666666 + s * 0.0002777777777777 ) * 1.0027379093382884 ;
+	gmst += ( h + mi * 0.01666666666667 + s * 0.0002777777777777 ) * 1.0027379093382884 ;
 	gmst = fmod(gmst, 24.0) ;
 
 	return gmst ;
@@ -131,7 +183,7 @@ double GMST(int y, int m, int d, int h, int mi, float s)
 
 
 
-double UTC2TAI(int y, int m, int d, int h, int mi, double s)
+double TAI(int y, int m, int d, int h, int mi, double s)
 	{
 
 	int n = 2020 - 1972 + 1 ; // limit array
@@ -161,5 +213,33 @@ double UTC2TAI(int y, int m, int d, int h, int mi, double s)
 	TAI = h + double(mi) * 0.01666666666666666 + (s + double(l)) * 2.777777777777777777e-4 ;
 
 	return TAI ;
+
+	}
+
+
+
+double GPS(int y, int m, int d, int h, int mi, double s)
+	{
+
+	double gps ;
+
+	gps = TAI(y, m, d, h, mi, s) - 5.27777777777777777778e-3 ;
+	
+	if (gps < 0)
+		gps += 24 ;
+
+	return gps ;
+
+	}
+
+
+double TT(int y, int m, int d, int h, int mi, double s)
+	{
+
+	double tt ;
+
+	tt = fmod( TAI(y, m, d, h, mi, s) + 8.94e-3, 24 ) ;
+
+	return tt ;
 
 	}
