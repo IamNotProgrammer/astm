@@ -40,24 +40,58 @@ double d_d(int y0, int m0, int d0, int h0, int mi0, float s0, int y, int m, int 
 		for (int c = m0; c < 12; c++)
 			diff += month[c] ;
 
+		// that was days to the end of year y0
+		// now we will have days since y
+		// because all years between are calulated later
+
 		diff += d - 1 ;
 		diff += double(h) / 24 + double(mi) / 1440 + s / 86400 ;
-		
+
+
 		if ( ( (y % 4) == 0 ) && ( ( (y % 100) != 0) || ( (y % 400) == 0) ) )
 			month[1] = 29 ;
-		
+
 		else
 			month[1] = 28 ;
-		
+	
 		for(int i = 0; i < (m - 1); i++)
 			diff += month[i] ;
 
 		}
 
 
-	else
+	else if (y < y0)
+		{
+
 		year = y + 1 ;
 
+		if ( ( (y % 4) == 0 ) && ( ( (y % 100) != 0) || ( (y % 400) == 0) ) )
+			month[1] = 29 ;
+
+		diff += month[m - 1] - d + 1 ;
+		diff += - double(h) / 24 - double(mi) / 1440 - s / 86400 ; // hour in day
+
+		for (int c = m; c < 12; c++)
+			diff += month[c] ;
+
+		// that was days to the end of year y
+		// now we will have days since y0
+		// because all years between are calulated later
+
+		diff += d0 - 1 ;
+		diff += double(h0) / 24 + double(mi0) / 1440 + s0 / 86400 ;
+
+
+		if ( ( (y0 % 4) == 0 ) && ( ( (y0 % 100) != 0) || ( (y0 % 400) == 0) ) )
+			month[1] = 29 ;
+
+		else
+			month[1] = 28 ;
+	
+		for(int i = 0; i < (m0 - 1); i++)
+			diff += month[i] ;
+
+		}
 
 	for (int i = 1; i < abs(y0 - y); i++)
 		{
