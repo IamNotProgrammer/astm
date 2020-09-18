@@ -13,4 +13,6 @@ double GPS(int, int, int, int, int, double) ;
 
 double TT(int, int, int, int, int, double) ;
 
+double anomaly(double) ;
+
 #endif /* ASTM_H */

@@ -243,3 +243,35 @@ double TT(int y, int m, int d, int h, int mi, double s)
 	return tt ;
 
 	}
+
+double anomaly(double jd)
+	{
+
+	double v, M, E ; // real anomaly, mean anomaly, some other anomaly
+	double e = 0.0167086 ; // Earth's excentricity
+	float dE = 0.002 ; // small change for integral 
+
+	// some constants first one is n-B (mean period - perihelion movement)
+	// second is epoch (peryhelion in 2020), 360 is to cut angle
+	// and the last one is to change degree to radian 
+
+	M = fmod( 0.9856002623651494 * (jd - 2455199.506250), 360) * \
+	0.017453292519943295 ;
+
+
+	for(int i = 0; i < 10; i++)
+        	E = M + e * sin(E) ;
+
+	v = 0 ; // just to make sure, idk how computers work
+
+	// this is integral, soon I will find better analitycal solution
+	// but for now I'm lazy so I have to use this ugly method of integrating
+
+	for (int i = 0; i < (500 * E); i++)
+	        v += 0.0019997208031983264 / ( 1 - e * cos(0.005 + i * dE) ) ;
+
+	return v ;
+
+	}
+
+	
